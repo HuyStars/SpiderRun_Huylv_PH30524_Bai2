@@ -8,6 +8,7 @@ TagManager:
   - deephold
   - coin
   - effect
+  - bom
   layers:
   - Default
   - TransparentFX

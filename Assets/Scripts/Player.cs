@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     public AudioSource death;
     public AudioSource coin;
     public AudioSource jump;
+    public AudioSource boms;
     public int score = 0;
     public Text textMetter;
     public Text textScore;
@@ -27,12 +28,17 @@ public class Player : MonoBehaviour
     public float jumpHeight = 8f;
     private bool grounded;
     private int jumpCount = 0;
+    public int maxHealth = 100;
+    public int currentHealth;
+    public HealthBar healthbar;
 
     // Start is called before the first frame update
     void Start()
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        currentHealth = maxHealth;
+        healthbar.SetMaxHealth(maxHealth);
         textScore.text = ""+score;
         textMetter.text = ""+(int)distanceTraveled;
         lastXPosition = transform.position.x;
@@ -68,6 +74,12 @@ public class Player : MonoBehaviour
         lastXPosition = transform.position.x;
     }
 
+    void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        healthbar.SetHealth(currentHealth);
+    }
+
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.tag == "ground")
@@ -96,6 +108,19 @@ public class Player : MonoBehaviour
             Score.text = ""+score;
             panelGameOver.SetActive(true);
             Time.timeScale = 0;
+        }
+
+        if (other.gameObject.tag == "bom")
+        {
+            TakeDamage(20);
+            boms.Play();
+            // Xóa object bom và hiệu ứng nổ sau một khoảng thời gian ngắn
+            Destroy(other.gameObject, 1f);
+            if (currentHealth == 0)
+            {
+                panelGameOver.SetActive(true);
+                Time.timeScale = 0;
+            }
         }
         
         if (other.gameObject.tag == "coin")
